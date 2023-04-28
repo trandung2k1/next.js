@@ -1,4 +1,5 @@
 import React from 'react';
+import { GetStaticProps } from 'next';
 import axios from 'axios';
 import { IPost } from '@/types/post';
 import Link from 'next/link';
@@ -12,19 +13,19 @@ const Posts = ({ posts }: IProps) => {
             <h2>All post</h2>
             {posts.map((post) => {
                 return (
-                    <>
+                    <div key={post.id}>
                         <h1>
                             {post.id} - {post.title}
                         </h1>
                         <Link href={`posts/${post.id}`}>See more</Link>
-                    </>
+                    </div>
                 );
             })}
         </div>
     );
 };
 
-export async function getStaticProps() {
+export const getStaticProps: GetStaticProps = async () => {
     const response = await axios.get<IPost[]>('https://jsonplaceholder.typicode.com/posts');
     return {
         props: {
@@ -32,6 +33,6 @@ export async function getStaticProps() {
         },
         revalidate: 1,
     };
-}
+};
 
 export default Posts;

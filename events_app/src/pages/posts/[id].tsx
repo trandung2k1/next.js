@@ -1,13 +1,16 @@
 import React from 'react';
+import { GetStaticProps, GetStaticPaths, GetStaticPropsContext } from 'next';
 import axios from 'axios';
 import { IPost } from '@/types/post';
 import { useRouter } from 'next/router';
+import { ParsedUrlQuery } from 'querystring';
 interface IProps {
     post: IPost;
 }
-interface IContext {
-    params: { id: string };
+interface IParams extends ParsedUrlQuery {
+    id: string;
 }
+
 const PostItem = ({ post }: IProps) => {
     const router = useRouter();
     if (router.isFallback) {
@@ -23,7 +26,7 @@ const PostItem = ({ post }: IProps) => {
         </div>
     );
 };
-export async function getStaticPaths() {
+export const getStaticPaths: GetStaticPaths = async () => {
     const { data } = await axios.get<IPost[]>(
         'https://jsonplaceholder.typicode.com/posts?_limit=10',
     );
@@ -31,9 +34,13 @@ export async function getStaticPaths() {
         params: { id: post.id.toString() },
     }));
     return { paths, fallback: true };
-}
-export const getStaticProps = async (context: IContext) => {
-    const res = await axios.get(`https://jsonplaceholder.typicode.com/posts/${+context.params.id}`);
+};
+export const getStaticProps: GetStaticProps<IProps, IParams> = async (
+    context: GetStaticPropsContext<IParams>,
+) => {
+    const res = await axios.get<IPost>(
+        `https://jsonplaceholder.typicode.com/posts/${context.params?.id}`,
+    );
     return {
         props: {
             post: res.data,
