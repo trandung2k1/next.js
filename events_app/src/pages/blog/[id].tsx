@@ -27,6 +27,7 @@ const BlogItem = ({ blog }: IProps) => {
                         <p>{blog.body}</p>
                         <p>createdAt: {moment(blog.createdAt).fromNow()}</p>
                         <p>updatedAt: {moment(blog.updatedAt).fromNow()}</p>
+                        <button onClick={() => router.back()}>Back</button>
                     </div>
                 </div>
             </div>
