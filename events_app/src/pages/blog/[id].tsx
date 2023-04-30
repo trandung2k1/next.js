@@ -1,38 +1,53 @@
-import React from 'react';
-import mongoose from 'mongoose';
 import { useRouter } from 'next/router';
-import { GetServerSideProps, GetStaticPaths, GetStaticProps } from 'next';
+import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from 'next';
+import Image from 'next/image';
+import moment from 'moment';
 import axios from 'axios';
 import { IBlog } from '@/types/blog';
-const BlogItem = () => {
+import { ParsedUrlQuery } from 'querystring';
+interface IProps {
+    blog: IBlog;
+}
+interface IParams extends ParsedUrlQuery {
+    id: string;
+}
+const BlogItem = ({ blog }: IProps) => {
     const router = useRouter();
-    const id: string = router.query.id as string;
-    console.log(typeof id);
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return (
-            <>
-                <h1>Invalid Id</h1>
-            </>
-        );
-    } else if (router.isFallback) {
+    if (router.isFallback) {
         return <h2>Loading..</h2>;
+    } else {
+        return (
+            <div>
+                <div style={{ display: 'flex' }}>
+                    <div>
+                        <Image src={blog.image} width={800} height={450} alt={blog.title} />
+                    </div>
+                    <div>
+                        <h3>{blog.title}</h3>
+                        <p>{blog.body}</p>
+                        <p>createdAt: {moment(blog.createdAt).fromNow()}</p>
+                        <p>updatedAt: {moment(blog.updatedAt).fromNow()}</p>
+                    </div>
+                </div>
+            </div>
+        );
     }
-    return <div>BlogItem</div>;
 };
-
-export const getStaticPaths = async () => {
-    const { data } = await axios.get<IBlog[]>('http://localhost:3000/api/blog');
+export const getStaticPaths: GetStaticPaths<IParams> = async () => {
+    const { data } = await axios.get<IBlog[]>('http://localhost:3000/api/blog?limit=1');
     const paths = data.map((blog) => ({
         params: { id: blog?._id!.toString() },
     }));
-    console.log(paths);
+    // console.log(paths);
     return { paths, fallback: true };
 };
-export const getStaticProps = async (context: any) => {
+export const getStaticProps: GetStaticProps<IProps, IParams> = async (
+    context: GetStaticPropsContext<IParams>,
+) => {
     const res = await axios.get<IBlog>(`http://localhost:3000/api/blog/${context.params?.id}`);
     return {
         props: {
-            post: res.data,
+            blog: res.data,
         },
     };
 };
