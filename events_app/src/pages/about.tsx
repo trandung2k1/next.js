@@ -3,7 +3,7 @@ import { GetServerSideProps } from 'next';
 import axios from 'axios';
 import connectDB from '@/db/db';
 const About = () => {
-    //Client
+    //Render client
     React.useEffect(() => {
         (async () => {
             const res = await axios.get('api/hello');
@@ -14,7 +14,7 @@ const About = () => {
     return <div>About</div>;
 };
 export const getServerSideProps: GetServerSideProps = async () => {
-    //Server
+    //Render server
     await connectDB();
     return {
         props: {},

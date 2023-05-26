@@ -39,7 +39,6 @@ export const getStaticPaths: GetStaticPaths<IParams> = async () => {
     const paths = data.map((blog) => ({
         params: { id: blog?._id!.toString() },
     }));
-    // console.log(paths);
     return { paths, fallback: true };
 };
 export const getStaticProps: GetStaticProps<IProps, IParams> = async (
